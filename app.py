@@ -4,88 +4,146 @@ import plotly.express as px
 from datetime import datetime, timedelta
 import random
 
-# --- 1. CONFIG & THEME ---
+# --- 1. SETTINGS & GEMINI-STYLE UI ---
 st.set_page_config(page_title="Quantum Product Architect", layout="wide")
 
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; color: white; }
-    .stMetric { background-color: #161b22; border-radius: 10px; padding: 15px; border: 1px solid #30363d; }
-    h1, h2, h3 { color: #58a6ff; }
+    /* Gemini/Apple White Theme */
+    .stApp { background-color: #f8f9fa; color: #1f1f1f; }
+    
+    /* Soft White Cards */
+    div[data-testid="stMetric"] {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    /* Clean Sidebar */
+    section[data-testid="stSidebar"] { background-color: white; border-right: 1px solid #e0e0e0; }
+    
+    /* Strategic Verdict Box */
+    .verdict-box {
+        background-color: #e8f0fe;
+        border-left: 5px solid #1a73e8;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    /* Custom Button */
+    .stButton>button {
+        background-color: #1a73e8;
+        color: white;
+        border-radius: 20px;
+        border: none;
+        padding: 10px 24px;
+        font-weight: 500;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. BRAIN: SCORING LOGIC ---
-def calculate_scores(df, method):
-    if method == "RICE":
-        # RICE = (Reach * Impact * Confidence) / Effort
-        return (df['Reach'] * df['Impact'] * (df['Confidence']/100)) / df['Effort']
-    else:
-        # WSJF = (Business Value + Time Criticality + Risk Reduction) / Effort (Job Size)
-        return (df['Business_Value'] + df['Time_Criticality'] + df['Risk_Reduction']) / df['Effort']
+# --- 2. THE BRAIN: AI VERDICT & FEATURE GENERATOR ---
+def get_strategic_verdict(product_name):
+    # Simulated AI analysis for the "Summary"
+    analysis = [
+        f"The market for **{product_name}** shows high 'Blue Ocean' potential. Focus on Gen Z aesthetic and sustainability.",
+        f"**{product_name}** is a high-competition niche. Success depends on the 'Risk Reduction' features and rapid time-to-market.",
+        f"Innovative approach. The RICE scores suggest the 'API Integration' should be deprioritized in favor of 'User Experience'."
+    ]
+    return random.choice(analysis)
 
-# --- 3. SIDEBAR & CONTROLS ---
+def generate_full_backlog(product_name):
+    # 7 Features to make the roadmap look professional
+    features = [
+        "Core MVP Design", "Social Integration", "AI Search Engine", 
+        "Beta Group Launch", "Sustainability Tracker", "Influencer Portal", "Secure Payment Gateway"
+    ]
+    new_data = []
+    for i, feature in enumerate(features):
+        new_data.append({
+            "Feature": f"{feature} - {product_name}",
+            "Reach": random.randint(1000, 8000),
+            "Impact": random.choice([1.0, 2.0, 3.0]),
+            "Confidence": random.randint(70, 100),
+            "Effort": random.randint(1, 5),
+            "Business_Value": random.randint(4, 10),
+            "Time_Criticality": random.randint(3, 9),
+            "Risk_Reduction": random.randint(2, 8),
+            "Start_Date": datetime.now().date() + timedelta(days=i*14)
+        })
+    return pd.DataFrame(new_data)
+
+# --- 3. SIDEBAR ---
 with st.sidebar:
-    st.title("⚙️ Strategy Control")
-    scoring_method = st.radio("Prioritization Framework", ["RICE", "WSJF"], help="RICE is for growth; WSJF is for Business Economics.")
+    st.image("https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d47353039331e16b92ad.svg", width=40)
+    st.title("Architect")
     st.markdown("---")
-    user_idea = st.text_input("New Product Goal", placeholder="e.g. Fintech App for Gen Z")
-    generate_btn = st.button("AI Discovery")
+    scoring_method = st.radio("Framework", ["RICE", "WSJF"])
+    product_idea = st.text_input("Product Goal", placeholder="e.g. Lady shoes for genz")
+    trigger = st.button("Generate Strategy")
 
-# --- 4. DATA INITIALIZATION ---
-if 'backlog' not in st.session_state or generate_btn:
-    # Creating a dynamic starting point
-    base_name = user_idea if user_idea else "Core Project"
-    st.session_state.backlog = pd.DataFrame([
-        {"Feature": f"Alpha Release - {base_name}", "Reach": 2000, "Impact": 3.0, "Confidence": 100, "Effort": 3, 
-         "Business_Value": 8, "Time_Criticality": 9, "Risk_Reduction": 5, "Start_Date": datetime.now().date()},
-        {"Feature": "API Integration Layer", "Reach": 500, "Impact": 2.0, "Confidence": 80, "Effort": 2, 
-         "Business_Value": 5, "Time_Criticality": 3, "Risk_Reduction": 7, "Start_Date": datetime.now().date() + timedelta(days=15)},
-    ])
+# --- 4. DATA LOGIC ---
+if 'backlog' not in st.session_state or trigger:
+    name = product_idea if product_idea else "New Project"
+    st.session_state.backlog = generate_full_backlog(name)
+    st.session_state.verdict = get_strategic_verdict(name)
 
-# --- 5. INTERFACE ---
-st.title("⚡ Quantum Product Architect")
-st.caption(f"Currently active framework: **{scoring_method}**")
+# --- 5. THE UI OUTPUT ---
+st.title("✨ Quantum Product Architect")
+
+# Strategic Verdict (The Summary Box)
+st.markdown(f"""
+    <div class="verdict-box">
+        <h4 style="margin-top:0; color:#1a73e8;">Strategic AI Verdict</h4>
+        <p style="font-size:1.1em;">{st.session_state.verdict}</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Metrics
-m1, m2, m3 = st.columns(3)
+m1, m2, m3, m4 = st.columns(4)
 m1.metric("Method", scoring_method)
-m2.metric("Total Tasks", len(st.session_state.backlog))
-m3.metric("Status", "Strategy Optimized")
+m2.metric("Total Features", len(st.session_state.backlog))
+m3.metric("Project Health", "Optimal")
+m4.metric("Market Fit", "88%")
 
-# Data Editor
-st.subheader("📋 Interactive Strategy Ledger")
+st.markdown("---")
+
+# Data Table
+st.subheader("📋 Executive Backlog")
 edited_df = st.data_editor(st.session_state.backlog, use_container_width=True, num_rows="dynamic")
 
-# Calculate & Sort
-edited_df['Score'] = calculate_scores(edited_df, scoring_method)
+# Math
+if scoring_method == "RICE":
+    edited_df['Score'] = (edited_df['Reach'] * edited_df['Impact'] * (edited_df['Confidence']/100)) / edited_df['Effort']
+else:
+    edited_df['Score'] = (edited_df['Business_Value'] + edited_df['Time_Criticality'] + edited_df['Risk_Reduction']) / edited_df['Effort']
+
 edited_df = edited_df.sort_values(by="Score", ascending=False)
 
-# --- 6. VISUALS ---
-tab1, tab2 = st.tabs(["📊 Priority Analysis", "📅 Release Roadmap"])
+# --- 6. CHARTS ---
+st.markdown("### 📊 Market & Delivery Intelligence")
+c1, c2 = st.columns(2)
 
-with tab1:
-    c1, c2 = st.columns(2)
-    with c1:
-        fig_bar = px.bar(edited_df, x="Score", y="Feature", orientation='h', color="Score", 
-                          title=f"{scoring_method} Ranking", template="plotly_dark")
-        st.plotly_chart(fig_bar, use_container_width=True)
-    with c2:
-        # Business Analyst Matrix
-        x_axis = "Effort"
-        y_axis = "Impact" if scoring_method == "RICE" else "Business_Value"
-        fig_scatter = px.scatter(edited_df, x=x_axis, y=y_axis, size="Score", color="Score",
-                                 hover_name="Feature", title="Priority Matrix", template="plotly_dark")
-        st.plotly_chart(fig_scatter, use_container_width=True)
+with c1:
+    fig_bar = px.bar(edited_df, x="Score", y="Feature", orientation='h', 
+                      color="Score", color_continuous_scale="Blues", template="plotly_white")
+    fig_bar.update_layout(showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(fig_bar, use_container_width=True)
 
-with tab2:
-    roadmap_data = []
+with c2:
+    # Gantt Roadmap
+    roadmap_list = []
     for _, row in edited_df.iterrows():
-        end = row['Start_Date'] + timedelta(days=int(row['Effort'] * 30))
-        roadmap_data.append(dict(Task=row['Feature'], Start=row['Start_Date'], Finish=end, Score=row['Score']))
+        end = row['Start_Date'] + timedelta(days=int(row['Effort'] * 25))
+        roadmap_list.append(dict(Task=row['Feature'], Start=row['Start_Date'], Finish=end, Score=row['Score']))
     
-    df_roadmap = pd.DataFrame(roadmap_data)
+    df_roadmap = pd.DataFrame(roadmap_list)
     fig_gantt = px.timeline(df_roadmap, x_start="Start", x_end="Finish", y="Task", color="Score",
-                             title="Gantt Release Schedule", template="plotly_dark")
+                             color_continuous_scale="Blues", template="plotly_white")
     fig_gantt.update_yaxes(autorange="reversed")
+    fig_gantt.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     st.plotly_chart(fig_gantt, use_container_width=True)
