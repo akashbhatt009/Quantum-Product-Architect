@@ -1,123 +1,91 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import random
 
-# --- 1. SETTINGS & CUSTOM STYLES ---
+# --- 1. CONFIG & THEME ---
 st.set_page_config(page_title="Quantum Product Architect", layout="wide")
 
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: white; }
-    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #58a6ff; color: white; border: none; }
-    .stButton>button:hover { background-color: #1f6feb; border: none; }
-    .metric-card { background-color: #161b22; border: 1px solid #30363d; padding: 20px; border_radius: 10px; text-align: center; }
+    .stMetric { background-color: #161b22; border-radius: 10px; padding: 15px; border: 1px solid #30363d; }
+    h1, h2, h3 { color: #58a6ff; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. AI STRATEGY ENGINE (Simulated Reasoning) ---
-def generate_ai_backlog(product_name):
-    """Simulates an AI generating features based on a product name."""
-    generic_features = [
-        "User Onboarding Flow", "Analytics Dashboard", "API Integration", 
-        "Mobile App Version", "Subscription Tier", "AI Chatbot Support",
-        "Social Sharing", "Data Encryption", "Cloud Sync", "Multi-language Support"
-    ]
-    selected = random.sample(generic_features, 5)
-    
-    new_data = []
-    for i, feature in enumerate(selected):
-        new_data.append({
-            "Feature": f"{feature} for {product_name}",
-            "Reach": random.randint(500, 5000),
-            "Impact": random.choice([0.5, 1.0, 2.0, 3.0]),
-            "Confidence": random.randint(50, 100),
-            "Effort": random.randint(1, 6),
-            "Start_Date": datetime.now().date() + timedelta(days=i*15)
-        })
-    return pd.DataFrame(new_data)
+# --- 2. BRAIN: SCORING LOGIC ---
+def calculate_scores(df, method):
+    if method == "RICE":
+        # RICE = (Reach * Impact * Confidence) / Effort
+        return (df['Reach'] * df['Impact'] * (df['Confidence']/100)) / df['Effort']
+    else:
+        # WSJF = (Business Value + Time Criticality + Risk Reduction) / Effort (Job Size)
+        return (df['Business_Value'] + df['Time_Criticality'] + df['Risk_Reduction']) / df['Effort']
 
-# --- 3. SIDEBAR & INPUT ---
+# --- 3. SIDEBAR & CONTROLS ---
 with st.sidebar:
-    st.title("⚙️ Strategy Settings")
+    st.title("⚙️ Strategy Control")
+    scoring_method = st.radio("Prioritization Framework", ["RICE", "WSJF"], help="RICE is for growth; WSJF is for Business Economics.")
     st.markdown("---")
-    user_idea = st.text_input("Product Vision", placeholder="e.g. AI Coffee Roaster")
-    generate_btn = st.button("Generate AI Strategy")
-    st.markdown("---")
-    st.write("Current Framework: **RICE Scoring**")
-    st.write("Roadmap Horizon: **3 Months**")
+    user_idea = st.text_input("New Product Goal", placeholder="e.g. Fintech App for Gen Z")
+    generate_btn = st.button("AI Discovery")
 
 # --- 4. DATA INITIALIZATION ---
 if 'backlog' not in st.session_state or generate_btn:
-    if generate_btn and user_idea:
-        st.session_state.backlog = generate_ai_backlog(user_idea)
-    elif 'backlog' not in st.session_state:
-        # Default starter data
-        st.session_state.backlog = pd.DataFrame([
-            {"Feature": "Core MVP Dashboard", "Reach": 2000, "Impact": 3.0, "Confidence": 100, "Effort": 2, "Start_Date": datetime.now().date()},
-            {"Feature": "Beta Testing Group", "Reach": 500, "Impact": 2.0, "Confidence": 80, "Effort": 1, "Start_Date": datetime.now().date() + timedelta(days=10)},
-        ])
+    # Creating a dynamic starting point
+    base_name = user_idea if user_idea else "Core Project"
+    st.session_state.backlog = pd.DataFrame([
+        {"Feature": f"Alpha Release - {base_name}", "Reach": 2000, "Impact": 3.0, "Confidence": 100, "Effort": 3, 
+         "Business_Value": 8, "Time_Criticality": 9, "Risk_Reduction": 5, "Start_Date": datetime.now().date()},
+        {"Feature": "API Integration Layer", "Reach": 500, "Impact": 2.0, "Confidence": 80, "Effort": 2, 
+         "Business_Value": 5, "Time_Criticality": 3, "Risk_Reduction": 7, "Start_Date": datetime.now().date() + timedelta(days=15)},
+    ])
 
-# --- 5. MAIN INTERFACE ---
+# --- 5. INTERFACE ---
 st.title("⚡ Quantum Product Architect")
-st.markdown("### Autonomous Product Discovery & Prioritization")
+st.caption(f"Currently active framework: **{scoring_method}**")
 
-# Metrics row
-cols = st.columns(4)
-total_reach = st.session_state.backlog['Reach'].sum()
-avg_effort = st.session_state.backlog['Effort'].mean()
+# Metrics
+m1, m2, m3 = st.columns(3)
+m1.metric("Method", scoring_method)
+m2.metric("Total Tasks", len(st.session_state.backlog))
+m3.metric("Status", "Strategy Optimized")
 
-cols[0].metric("Total Reach", f"{total_reach:,}")
-cols[1].metric("Avg. Effort", f"{avg_effort:.1f} mo")
-cols[2].metric("Strategy Phase", "Discovery")
-cols[3].metric("Model Status", "Active")
+# Data Editor
+st.subheader("📋 Interactive Strategy Ledger")
+edited_df = st.data_editor(st.session_state.backlog, use_container_width=True, num_rows="dynamic")
 
-st.markdown("---")
+# Calculate & Sort
+edited_df['Score'] = calculate_scores(edited_df, scoring_method)
+edited_df = edited_df.sort_values(by="Score", ascending=False)
 
-# Editable Data Table
-st.subheader("📋 Dynamic Strategy Backlog")
-edited_df = st.data_editor(
-    st.session_state.backlog,
-    num_rows="dynamic",
-    use_container_width=True,
-    column_config={
-        "Confidence": st.column_config.NumberColumn("Confidence %", format="%d%%"),
-        "Impact": st.column_config.SelectboxColumn("Impact Score", options=[0.5, 1.0, 2.0, 3.0])
-    }
-)
-
-# RICE Calculation
-edited_df['RICE_Score'] = (edited_df['Reach'] * edited_df['Impact'] * (edited_df['Confidence']/100)) / edited_df['Effort']
-edited_df = edited_df.sort_values(by="RICE_Score", ascending=False)
-
-# --- 6. VISUALIZATIONS ---
-tab1, tab2 = st.tabs(["📊 Strategic Analysis", "📅 Delivery Roadmap"])
+# --- 6. VISUALS ---
+tab1, tab2 = st.tabs(["📊 Priority Analysis", "📅 Release Roadmap"])
 
 with tab1:
     c1, c2 = st.columns(2)
     with c1:
-        fig_rice = px.bar(edited_df, x="RICE_Score", y="Feature", orientation='h', 
-                          title="RICE Priority Ranking", color="RICE_Score", template="plotly_dark")
-        st.plotly_chart(fig_rice, use_container_width=True)
+        fig_bar = px.bar(edited_df, x="Score", y="Feature", orientation='h', color="Score", 
+                          title=f"{scoring_method} Ranking", template="plotly_dark")
+        st.plotly_chart(fig_bar, use_container_width=True)
     with c2:
-        fig_bubble = px.scatter(edited_df, x="Effort", y="Impact", size="Reach", color="RICE_Score",
-                                hover_name="Feature", title="Impact vs. Effort Matrix", template="plotly_dark")
-        st.plotly_chart(fig_bubble, use_container_width=True)
+        # Business Analyst Matrix
+        x_axis = "Effort"
+        y_axis = "Impact" if scoring_method == "RICE" else "Business_Value"
+        fig_scatter = px.scatter(edited_df, x=x_axis, y=y_axis, size="Score", color="Score",
+                                 hover_name="Feature", title="Priority Matrix", template="plotly_dark")
+        st.plotly_chart(fig_scatter, use_container_width=True)
 
 with tab2:
-    # Build Roadmap data
-    roadmap_list = []
+    roadmap_data = []
     for _, row in edited_df.iterrows():
         end = row['Start_Date'] + timedelta(days=int(row['Effort'] * 30))
-        roadmap_list.append(dict(Task=row['Feature'], Start=row['Start_Date'], Finish=end, Priority=row['RICE_Score']))
+        roadmap_data.append(dict(Task=row['Feature'], Start=row['Start_Date'], Finish=end, Score=row['Score']))
     
-    df_roadmap = pd.DataFrame(roadmap_list)
-    fig_gantt = px.timeline(df_roadmap, x_start="Start", x_end="Finish", y="Task", color="Priority",
-                             title="Automated Release Timeline", template="plotly_dark")
+    df_roadmap = pd.DataFrame(roadmap_data)
+    fig_gantt = px.timeline(df_roadmap, x_start="Start", x_end="Finish", y="Task", color="Score",
+                             title="Gantt Release Schedule", template="plotly_dark")
     fig_gantt.update_yaxes(autorange="reversed")
     st.plotly_chart(fig_gantt, use_container_width=True)
-
-st.markdown("---")
-st.caption("Quantum Product Architect | Framework-driven decision support for Product Owners.")
