@@ -4,146 +4,152 @@ import plotly.express as px
 from datetime import datetime, timedelta
 import random
 
-# --- 1. SETTINGS & GEMINI-STYLE UI ---
-st.set_page_config(page_title="Quantum Product Architect", layout="wide")
+# --- 1. SETTINGS & ELITE GEMINI THEME ---
+st.set_page_config(page_title="Quantum Stratagem", layout="wide")
 
 st.markdown("""
     <style>
-    /* Gemini/Apple White Theme */
-    .stApp { background-color: #f8f9fa; color: #1f1f1f; }
+    /* Ultra-Clean White Theme */
+    .stApp { background-color: #ffffff; color: #1d1d1f; }
     
-    /* Soft White Cards */
-    div[data-testid="stMetric"] {
-        background-color: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    /* Elegant Sidebar */
+    section[data-testid="stSidebar"] { 
+        background-color: #f5f5f7; 
+        border-right: 1px solid #d2d2d7; 
     }
     
-    /* Clean Sidebar */
-    section[data-testid="stSidebar"] { background-color: white; border-right: 1px solid #e0e0e0; }
-    
-    /* Strategic Verdict Box */
-    .verdict-box {
-        background-color: #e8f0fe;
-        border-left: 5px solid #1a73e8;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 25px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    /* Custom Button */
-    .stButton>button {
-        background-color: #1a73e8;
-        color: white;
+    /* Glassmorphism Verdict Box */
+    .elite-verdict {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 102, 204, 0.2);
+        padding: 30px;
         border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        border-left: 8px solid #0066cc;
+        margin-bottom: 30px;
+    }
+
+    /* Metric Styling */
+    div[data-testid="stMetric"] {
+        background-color: #ffffff;
+        border-bottom: 3px solid #0066cc;
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    /* Primary Button */
+    .stButton>button {
+        background: linear-gradient(135deg, #0066cc 0%, #004494 100%);
+        color: white;
+        border-radius: 12px;
         border: none;
-        padding: 10px 24px;
-        font-weight: 500;
+        padding: 12px 30px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. THE BRAIN: AI VERDICT & FEATURE GENERATOR ---
-def get_strategic_verdict(product_name):
-    # Simulated AI analysis for the "Summary"
-    analysis = [
-        f"The market for **{product_name}** shows high 'Blue Ocean' potential. Focus on Gen Z aesthetic and sustainability.",
-        f"**{product_name}** is a high-competition niche. Success depends on the 'Risk Reduction' features and rapid time-to-market.",
-        f"Innovative approach. The RICE scores suggest the 'API Integration' should be deprioritized in favor of 'User Experience'."
+# --- 2. ELITE LOGIC: ANALYTICS ENGINE ---
+def get_strategic_summary(product_name):
+    summaries = [
+        f"**Market Opportunity:** The {product_name} sector is currently undergoing a digital shift. By prioritizing high-reach features, we can capture 15% more market share in Q3.",
+        f"**Risk Profile:** High. However, the {product_name} roadmap minimizes capital expenditure by front-loading high-confidence features.",
+        f"**Executive Summary:** This {product_name} strategy balances aggressive Gen Z acquisition with robust risk mitigation frameworks."
     ]
-    return random.choice(analysis)
+    return random.choice(summaries)
 
-def generate_full_backlog(product_name):
-    # 7 Features to make the roadmap look professional
-    features = [
-        "Core MVP Design", "Social Integration", "AI Search Engine", 
-        "Beta Group Launch", "Sustainability Tracker", "Influencer Portal", "Secure Payment Gateway"
-    ]
-    new_data = []
-    for i, feature in enumerate(features):
-        new_data.append({
-            "Feature": f"{feature} - {product_name}",
-            "Reach": random.randint(1000, 8000),
-            "Impact": random.choice([1.0, 2.0, 3.0]),
-            "Confidence": random.randint(70, 100),
+def generate_elite_backlog(product_name):
+    # Expanded list for a robust roadmap
+    features = ["Gen Z Portal", "AI Stylist Engine", "Viral Loop Integration", 
+                "Sustainability Ledger", "Global Logistics API", "Premium Membership", "Influencer Dashboard"]
+    data = []
+    for i, f in enumerate(features):
+        data.append({
+            "Feature": f"{f} - {product_name}",
+            "Reach": random.randint(2000, 9000),
+            "Impact": random.choice([1, 2, 3]),
+            "Confidence": random.randint(60, 100),
             "Effort": random.randint(1, 5),
-            "Business_Value": random.randint(4, 10),
-            "Time_Criticality": random.randint(3, 9),
-            "Risk_Reduction": random.randint(2, 8),
+            "Business_Value": random.randint(5, 10),
+            "Time_Criticality": random.randint(4, 9),
+            "Risk_Reduction": random.randint(3, 8),
             "Start_Date": datetime.now().date() + timedelta(days=i*14)
         })
-    return pd.DataFrame(new_data)
+    return pd.DataFrame(data)
 
 # --- 3. SIDEBAR ---
 with st.sidebar:
-    st.image("https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d47353039331e16b92ad.svg", width=40)
-    st.title("Architect")
+    st.title("💎 Stratagem")
     st.markdown("---")
     scoring_method = st.radio("Framework", ["RICE", "WSJF"])
-    product_idea = st.text_input("Product Goal", placeholder="e.g. Lady shoes for genz")
-    trigger = st.button("Generate Strategy")
+    product_goal = st.text_input("Venture Goal", placeholder="e.g. Lady shoes for genz")
+    trigger = st.button("Synthesize Strategy")
 
-# --- 4. DATA LOGIC ---
+# --- 4. DATA PROCESSING ---
 if 'backlog' not in st.session_state or trigger:
-    name = product_idea if product_idea else "New Project"
-    st.session_state.backlog = generate_full_backlog(name)
-    st.session_state.verdict = get_strategic_verdict(name)
+    name = product_goal if product_goal else "Venture Alpha"
+    st.session_state.backlog = generate_elite_backlog(name)
+    st.session_state.summary = get_strategic_summary(name)
 
-# --- 5. THE UI OUTPUT ---
-st.title("✨ Quantum Product Architect")
+df = st.session_state.backlog
 
-# Strategic Verdict (The Summary Box)
+# --- 5. CALCULATIONS ---
+if scoring_method == "RICE":
+    df['Score'] = (df['Reach'] * df['Impact'] * (df['Confidence']/100)) / df['Effort']
+    chart_title = "Impact vs. Reach (RICE Growth)"
+    color_scale = "Blues"
+else:
+    df['Score'] = (df['Business_Value'] + df['Time_Criticality'] + df['Risk_Reduction']) / df['Effort']
+    chart_title = "Economic Priority (WSJF Economics)"
+    color_scale = "Reds"
+
+df = df.sort_values(by="Score", ascending=False)
+
+# --- 6. ELITE UI OUTPUT ---
+st.title("⚡ Quantum Stratagem")
+
+# The Elite Verdict Box
 st.markdown(f"""
-    <div class="verdict-box">
-        <h4 style="margin-top:0; color:#1a73e8;">Strategic AI Verdict</h4>
-        <p style="font-size:1.1em;">{st.session_state.verdict}</p>
+    <div class="elite-verdict">
+        <span style="text-transform: uppercase; letter-spacing: 2px; color: #0066cc; font-weight: bold;">Executive Intelligence Summary</span>
+        <p style="font-size: 1.25em; margin-top: 10px; line-height: 1.6;">{st.session_state.summary}</p>
     </div>
     """, unsafe_allow_html=True)
 
-# Metrics
-m1, m2, m3, m4 = st.columns(4)
-m1.metric("Method", scoring_method)
-m2.metric("Total Features", len(st.session_state.backlog))
-m3.metric("Project Health", "Optimal")
-m4.metric("Market Fit", "88%")
+# Key Performance Indicators
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Framework", scoring_method)
+c2.metric("Backlog Depth", len(df))
+c3.metric("Avg. Confidence", f"{int(df['Confidence'].mean())}%")
+c4.metric("Strategy Fit", "Elite")
 
 st.markdown("---")
 
-# Data Table
-st.subheader("📋 Executive Backlog")
-edited_df = st.data_editor(st.session_state.backlog, use_container_width=True, num_rows="dynamic")
+# Data Interaction
+st.subheader("📋 The Strategy Ledger")
+edited_df = st.data_editor(df, use_container_width=True, num_rows="dynamic")
 
-# Math
-if scoring_method == "RICE":
-    edited_df['Score'] = (edited_df['Reach'] * edited_df['Impact'] * (edited_df['Confidence']/100)) / edited_df['Effort']
-else:
-    edited_df['Score'] = (edited_df['Business_Value'] + edited_df['Time_Criticality'] + edited_df['Risk_Reduction']) / edited_df['Effort']
+# --- 7. INTELLIGENCE VISUALS ---
+st.markdown(f"### 📈 {chart_title}")
+col_left, col_right = st.columns(2)
 
-edited_df = edited_df.sort_values(by="Score", ascending=False)
-
-# --- 6. CHARTS ---
-st.markdown("### 📊 Market & Delivery Intelligence")
-c1, c2 = st.columns(2)
-
-with c1:
+with col_left:
+    # Bar Chart shows the Final Score
     fig_bar = px.bar(edited_df, x="Score", y="Feature", orientation='h', 
-                      color="Score", color_continuous_scale="Blues", template="plotly_white")
-    fig_bar.update_layout(showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+                      color="Score", color_continuous_scale=color_scale, template="plotly_white")
+    fig_bar.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     st.plotly_chart(fig_bar, use_container_width=True)
 
-with c2:
-    # Gantt Roadmap
-    roadmap_list = []
-    for _, row in edited_df.iterrows():
-        end = row['Start_Date'] + timedelta(days=int(row['Effort'] * 25))
-        roadmap_list.append(dict(Task=row['Feature'], Start=row['Start_Date'], Finish=end, Score=row['Score']))
+with col_right:
+    # Scatter plot changes based on the framework
+    if scoring_method == "RICE":
+        fig_scatter = px.scatter(edited_df, x="Reach", y="Impact", size="Score", color="Score",
+                                 color_continuous_scale="Blues", template="plotly_white", title="Reach vs Impact")
+    else:
+        fig_scatter = px.scatter(edited_df, x="Time_Criticality", y="Business_Value", size="Score", color="Score",
+                                 color_continuous_scale="Reds", template="plotly_white", title="Criticality vs Value")
     
-    df_roadmap = pd.DataFrame(roadmap_list)
-    fig_gantt = px.timeline(df_roadmap, x_start="Start", x_end="Finish", y="Task", color="Score",
-                             color_continuous_scale="Blues", template="plotly_white")
-    fig_gantt.update_yaxes(autorange="reversed")
-    fig_gantt.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-    st.plotly_chart(fig_gantt, use_container_width=True)
+    fig_scatter.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(fig_scatter, use_container_width=True)
