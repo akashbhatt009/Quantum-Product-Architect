@@ -4,21 +4,21 @@ import plotly.express as px
 from datetime import datetime, timedelta
 import random
 
-# --- 1. SETTINGS & ELITE APPLE/GEMINI THEME ---
+# --- 1. SETTINGS & ELITE GEMINI THEME ---
 st.set_page_config(page_title="Quantum Stratagem", layout="wide")
 
 st.markdown("""
     <style>
-    /* Ultra-Clean White Theme */
+    /* Clean White Aesthetic */
     .stApp { background-color: #ffffff; color: #1d1d1f; }
     
-    /* Elegant Sidebar */
+    /* Soft Sidebar */
     section[data-testid="stSidebar"] { 
         background-color: #f5f5f7; 
         border-right: 1px solid #d2d2d7; 
     }
     
-    /* Glassmorphism Verdict Box */
+    /* Elite Verdict Card */
     .elite-verdict {
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(10px);
@@ -26,21 +26,21 @@ st.markdown("""
         padding: 30px;
         border-radius: 20px;
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-        border-left: 8px solid #0066cc;
+        border-left: 8px solid #1a73e8;
         margin-bottom: 30px;
     }
 
     /* Metric Styling */
     div[data-testid="stMetric"] {
         background-color: #ffffff;
-        border-bottom: 3px solid #0066cc;
+        border-bottom: 3px solid #1a73e8;
         padding: 20px;
         border-radius: 12px;
     }
 
-    /* Primary Button - Blue Gradient */
+    /* Blue Action Button */
     .stButton>button {
-        background: linear-gradient(135deg, #0066cc 0%, #004494 100%);
+        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
         color: white;
         border-radius: 12px;
         border: none;
@@ -51,18 +51,18 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. THE BRAIN: STRATEGY ENGINE ---
+# --- 2. LOGIC: STRATEGY & FEATURE SYNTHESIS ---
 def get_strategic_summary(product_name):
     summaries = [
-        f"**Market Opportunity:** The {product_name} sector is shifting. Data suggests a 22% gap in Gen-Z tailored solutions.",
-        f"**Risk Profile:** Moderate. The {product_name} roadmap focuses on low-CAPEX testing to validate market fit.",
-        f"**Executive Summary:** This {product_name} strategy utilizes high-impact 'Viral Loops' to reduce customer acquisition costs."
+        f"**Market Opportunity:** The {product_name} sector is currently experiencing a digital-first shift. Strategic focus on Gen-Z engagement is advised.",
+        f"**Risk Profile:** Low to Moderate. This {product_name} roadmap prioritizes 'Risk Reduction' features to protect capital expenditure.",
+        f"**Executive Summary:** Data indicates that {product_name} requires a focus on high-reach 'Viral Loops' to lower customer acquisition costs."
     ]
     return random.choice(summaries)
 
 def generate_elite_backlog(product_name):
-    # Industry-specific feature intelligence
     p_lower = product_name.lower()
+    # Industry-specific logic
     if "shoe" in p_lower:
         features = ["AR Try-on Mirror", "Drop Shipping API", "Limited Edition Raffle", "Eco-Sole Tracker", "Influencer Box", "3D Foot Scan", "Resale Marketplace"]
     elif "coffee" in p_lower:
@@ -87,25 +87,33 @@ def generate_elite_backlog(product_name):
         })
     return pd.DataFrame(data)
 
-# --- 3. SIDEBAR: IDENTITY & CONTROL ---
+# --- 3. SESSION STATE ---
 if 'backlog' not in st.session_state:
-    st.session_state.backlog = generate_elite_backlog("Venture Alpha")
-    st.session_state.summary = "Awaiting Venture Input for Analysis..."
+    st.session_state.backlog = generate_elite_backlog("Initial Venture")
+    st.session_state.summary = "Submit a Product Goal to begin Strategic Synthesis."
     st.session_state.count = 0
 
+# --- 4. SIDEBAR: THE AKASH BRAND ---
 with st.sidebar:
     st.title("💎 Stratagem")
     
-    # Professional Bio Card
     st.markdown("""
         <div style="background-color: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e0e0e0; margin-bottom: 20px;">
             <p style="margin: 0; font-size: 0.85em; color: #5f6368; font-weight: 600; text-transform: uppercase;">Lead Architect</p>
-            <p style="margin: 0; font-size: 1.1em; font-weight: 700; color: #1d1d1f;">[Your Name]</p>
-            <p style="margin: 0; font-size: 0.8em; color: #5f6368;">AI Product Strategist</p>
+            <p style="margin: 0; font-size: 1.25em; font-weight: 700; color: #1d1d1f;">Akash</p>
+            <p style="margin: 0; font-size: 0.85em; color: #1a73e8; font-weight: 500;">AI Product Strategist</p>
         </div>
     """, unsafe_allow_html=True)
 
-    scoring_method = st.radio("Framework Intelligence", ["RICE", "WSJF"], help="RICE = Consumer Growth | WSJF = Business Economics")
+    st.markdown("""
+        <div style="font-size: 0.85em; color: #3c4043; line-height: 1.5; margin-bottom: 20px;">
+        <b>About Stratagem:</b><br>
+        A decision-intelligence engine designed to transform product ideas into data-backed roadmaps using RICE and WSJF frameworks.
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    scoring_method = st.radio("Framework Intelligence", ["RICE", "WSJF"], help="RICE = Consumer Growth | WSJF = Economic Priority")
     product_goal = st.text_input("Venture Goal", placeholder="e.g. Lady shoes for genz")
     
     if st.button("Synthesize Strategy"):
@@ -114,11 +122,8 @@ with st.sidebar:
         st.session_state.summary = get_strategic_summary(name)
         st.session_state.count += 1
         st.rerun()
-    
-    st.markdown("---")
-    st.markdown("""<p style='font-size: 0.75em; color: #8e8e93;'><b>Tech Stack:</b> Python 3.11, Streamlit, Plotly Analytics, RICE/WSJF Logic</p>""", unsafe_allow_html=True)
 
-# --- 4. CALCULATIONS ---
+# --- 5. CALCULATIONS ---
 df = st.session_state.backlog.copy()
 
 if scoring_method == "RICE":
@@ -132,44 +137,41 @@ else:
 
 df = df.sort_values(by="Score", ascending=False)
 
-# --- 5. UI MAIN OUTPUT ---
+# --- 6. MAIN DISPLAY ---
 st.title("⚡ Quantum Stratagem")
 
-# The Elite Summary Card
 st.markdown(f"""
     <div class="elite-verdict">
-        <span style="letter-spacing: 2px; color: #0066cc; font-weight: bold; text-transform: uppercase;">Executive Intelligence Summary</span>
-        <p style="font-size: 1.25em; margin-top: 10px; line-height: 1.6;">{st.session_state.summary}</p>
+        <span style="letter-spacing: 2px; color: #1a73e8; font-weight: bold; text-transform: uppercase; font-size: 0.8em;">Executive Intelligence Summary</span>
+        <p style="font-size: 1.25em; margin-top: 10px; line-height: 1.5;">{st.session_state.summary}</p>
     </div>
     """, unsafe_allow_html=True)
 
-# KPIs
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Framework", scoring_method)
-c2.metric("Backlog Depth", len(df))
-c3.metric("Avg. Confidence", f"{int(df['Confidence'].mean())}%")
+c2.metric("Backlog Items", len(df))
+c3.metric("System Health", "Optimal")
 c4.metric("Strategy Fit", "Elite")
 
 st.markdown("---")
 
-# The Interactive Ledger (Wipes on re-synthesis due to key change)
 st.subheader("📋 The Strategy Ledger")
-edited_df = st.data_editor(df, use_container_width=True, key=f"editor_{st.session_state.count}")
+# Key refresh logic to wipe the table when clicking 'Synthesize'
+edited_df = st.data_editor(df, use_container_width=True, key=f"ledger_{st.session_state.count}")
 
-# --- 6. INTELLIGENCE VISUALS ---
-st.markdown(f"### 📈 {scoring_method} Priority Intelligence")
-col_left, col_right = st.columns(2)
+st.markdown("---")
 
-with col_left:
+# --- 7. CHARTS ---
+st.markdown(f"### 📈 {scoring_method} Analysis")
+left, right = st.columns(2)
+
+with left:
     fig_bar = px.bar(edited_df, x="Score", y="Feature", orientation='h', 
                       color="Score", color_continuous_scale=color_scale, template="plotly_white")
-    fig_bar.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     st.plotly_chart(fig_bar, use_container_width=True)
 
-with col_right:
-    # Improved Bubble Chart - Priority Score dictates bubble size
+with right:
     fig_scatter = px.scatter(edited_df, x=x_axis, y=y_axis, size="Score", color="Score",
                              color_continuous_scale=color_scale, template="plotly_white",
                              title=f"Bubble Size = {scoring_method} Priority Score")
-    fig_scatter.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     st.plotly_chart(fig_scatter, use_container_width=True)
